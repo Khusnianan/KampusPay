@@ -53,16 +53,48 @@ def input_biaya_kuliah():
         tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
         semester = st.selectbox("Semester", ["Ganjil", "Genap"])
         biaya = st.number_input("Biaya Kuliah", min_value=0.0, format="%.2f")
+        
+        # Tombol submit
         submit = st.form_submit_button("Simpan")
-
+        
+        # Tombol-tombol lainnya
+        tombol_cari = st.form_submit_button("Cari")
+        tombol_hapus = st.form_submit_button("Hapus")
+        tombol_cek_biaya = st.form_submit_button("Cek Biaya")
+        
         if submit:
+            # Simpan data
             query = '''INSERT INTO biaya_kuliah
                        (program_studi, nim, nama, sks_kuliah, tahun, semester, biaya_total)
                        VALUES (%s, %s, %s, %s, %s, %s, %s)'''
             run_query(query, (program_studi, nim, nama, sks_kuliah, tahun, semester, biaya))
             st.success("Biaya kuliah berhasil disimpan.")
+        
+        if tombol_cari:
+            # Cari data berdasarkan NIM
+            query = '''SELECT * FROM biaya_kuliah WHERE nim = %s'''
+            results = run_query(query, (nim,), fetch=True)
+            if results:
+                st.dataframe(results)
+            else:
+                st.warning("Data tidak ditemukan.")
+        
+        if tombol_hapus:
+            # Hapus data berdasarkan NIM
+            query = '''DELETE FROM biaya_kuliah WHERE nim = %s'''
+            run_query(query, (nim,))
+            st.success("Data biaya kuliah berhasil dihapus.")
+        
+        if tombol_cek_biaya:
+            # Cek total biaya kuliah berdasarkan NIM
+            query = '''SELECT biaya_total FROM biaya_kuliah WHERE nim = %s'''
+            result = run_query(query, (nim,), fetch=True)
+            if result:
+                st.write(f"Total Biaya Kuliah: Rp {result[0][0]:,.2f}")
+            else:
+                st.warning("Data biaya kuliah tidak ditemukan.")
 
-# Halaman: Bayar Angsuran
+# Halaman: Bayar Angsuran Biaya Kuliah
 def bayar_angsuran():
     st.header("Bayar Angsuran Biaya Kuliah")
     with st.form("form_angsuran"):
@@ -80,14 +112,36 @@ def bayar_angsuran():
         semester = st.selectbox("Semester", ["Ganjil", "Genap"])
         tanggal = st.date_input("Tanggal", value=date.today())
         bayar = st.number_input("Jumlah Bayar", min_value=0.0, format="%.2f")
+        
+        # Tombol submit
         submit = st.form_submit_button("Simpan")
-
+        
+        # Tombol lainnya
+        tombol_cari = st.form_submit_button("Cari")
+        tombol_hapus = st.form_submit_button("Hapus")
+        
         if submit:
+            # Simpan data angsuran
             query = '''INSERT INTO angsuran_kuliah
                        (program_studi, nim, nama, angsuran_ke, tahun, semester, tanggal_pembayaran, jumlah_bayar)
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
             run_query(query, (program_studi, nim, nama, angsuran_ke, tahun, semester, tanggal, bayar))
             st.success("Pembayaran angsuran berhasil disimpan.")
+        
+        if tombol_cari:
+            # Cari data berdasarkan NIM dan angsuran ke-
+            query = '''SELECT * FROM angsuran_kuliah WHERE nim = %s AND angsuran_ke = %s'''
+            results = run_query(query, (nim, angsuran_ke), fetch=True)
+            if results:
+                st.dataframe(results)
+            else:
+                st.warning("Data angsuran tidak ditemukan.")
+        
+        if tombol_hapus:
+            # Hapus data angsuran berdasarkan NIM dan angsuran ke-
+            query = '''DELETE FROM angsuran_kuliah WHERE nim = %s AND angsuran_ke = %s'''
+            run_query(query, (nim, angsuran_ke))
+            st.success("Data angsuran berhasil dihapus.")
 
 # Halaman: Pencarian Angsuran
 def cari_angsuran():
@@ -113,7 +167,7 @@ def cari_angsuran():
         st.dataframe(results, use_container_width=True)
 
 # Navigasi
-menu = st.sidebar.selectbox("Menu", [
+menu = st.sidebar.radio("Menu", [
     "Home", 
     "Input Biaya Kuliah", 
     "Bayar Angsuran", 
