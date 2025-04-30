@@ -26,15 +26,48 @@ def run_query(query, params=None, fetch=False):
 
 # Halaman: Home
 def home():
-    st.title("🎓 Sistem Pembayaran Uang Kuliah Mahasiswa")
+    # Konfigurasi tampilan
+    st.set_page_config(layout="centered")
+    
+    # Header utama dengan spacing yang baik
+    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+    st.title("Sistem Pembayaran Kuliah")
+    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+    st.subheader("Universitas Bina Nusantara")  # Ganti dengan nama universitas
+    
+    # Garis pemisah estetik
+    st.markdown("---")
+    
+    # Gambar ilustrasi (opsional)
+    # st.image("payment_illustration.png", width=300)  # Uncomment jika punya gambar
+    
+    # Pesan sambutan singkat
     st.markdown("""
-        Selamat datang di sistem manajemen pembayaran kuliah. Anda dapat:
+    <div style='text-align: center; margin: 40px 0;'>
+        <p style='font-size: 18px;'>
+            Selamat datang di sistem pembayaran kuliah terpadu.
+            <br>Gunakan menu di sidebar untuk mulai.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Tombol aksi utama
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        if st.button("**Masuk ke Sistem**", type="primary", use_container_width=True):
+            st.switch_page("/dashboard")  # Ganti dengan halaman tujuan
+    
+    # Footer sederhana
+    st.markdown("---")
+    st.markdown(
+        "<div style='text-align: center; color: #666; margin-top: 50px;'>"
+        "© 2023 Universitas Bina Nusantara - Bagian Keuangan"
+        "</div>", 
+        unsafe_allow_html=True
+    )
 
-        - Menginput dan mengecek biaya kuliah
-        - Mengelola pembayaran angsuran
-        - Melihat laporan pembayaran lunas dan belum lunas
-    """)
-
+if __name__ == "__main__":
+    home()
 # Halaman: Input Biaya Kuliah
 def input_biaya_kuliah():
     st.header("Input Biaya Kuliah")
