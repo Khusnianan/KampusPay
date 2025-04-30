@@ -16,22 +16,9 @@ def run_query(query, params=None, fetch=False):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(query, params)
-    columns = [desc[0] for desc in cur.description]
-if not fetch:
-        conn.commit()
-        cur.close()
-        conn.close()
-        return None
-    
-    # Jika query membutuhkan hasil (SELECT), ambil deskripsi kolom dan hasilnya
-    columns = [desc[0] for desc in cur.description] if cur.description else []
-    rows = cur.fetchall()  # Mengambil hasil query
-    
-    if rows:  # Pastikan rows tidak kosong
-        data = pd.DataFrame(rows, columns=columns)  # Membuat DataFrame dengan nama kolom
-    else:
-        data = pd.DataFrame()  # Jika tidak ada data, kembalikan DataFrame kosong
-    
+    data = None
+    if fetch:
+        data = cur.fetchall()
     conn.commit()
     cur.close()
     conn.close()
@@ -87,8 +74,8 @@ def input_biaya_kuliah():
             # Cari data berdasarkan NIM
             query = '''SELECT * FROM biaya_kuliah WHERE nim = %s'''
             results = run_query(query, (nim,), fetch=True)
-            if not results.empty:
-                st.dataframe(results, use_container_width=True)
+            if results:
+                st.dataframe(results)
             else:
                 st.warning("Data tidak ditemukan.")
         
@@ -145,8 +132,8 @@ def bayar_angsuran():
             # Cari data berdasarkan NIM dan angsuran ke-
             query = '''SELECT * FROM angsuran_kuliah WHERE nim = %s AND angsuran_ke = %s'''
             results = run_query(query, (nim, angsuran_ke), fetch=True)
-            if not results.empty:
-                st.dataframe(results, use_container_width=True)
+            if results:
+                st.dataframe(results)
             else:
                 st.warning("Data angsuran tidak ditemukan.")
         
@@ -178,71 +165,6 @@ def cari_angsuran():
         '''
         results = run_query(query, (program_studi, tahun, semester, tanggal), fetch=True)
         st.dataframe(results, use_container_width=True)
-
-def laporan_lunas():
-    st.header("Laporan Angsuran Lunas")
-    
-    program_studi = st.selectbox("Program Studi", [
-        "Teknik Informatika", 
-        "Teknik Mesin", 
-        "Teknik Industri", 
-        "Teknik Tekstil", 
-        "Teknik BOM"
-    ])
-    tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
-    semester = st.selectbox("Semester", ["Ganjil", "Genap"])
-    
-    if st.button("Cari Lunas"):
-        # Query untuk mendapatkan angsuran yang sudah lunas
-        query = '''
-            SELECT nim, nama, angsuran_ke, jumlah_bayar, tanggal_pembayaran
-            FROM angsuran_kuliah
-            WHERE program_studi = %s AND tahun = %s AND semester = %s
-            GROUP BY nim, nama, angsuran_ke, jumlah_bayar, tanggal_pembayaran
-            HAVING SUM(jumlah_bayar) >= (SELECT biaya_total FROM biaya_kuliah WHERE nim = angsuran_kuliah.nim)
-        '''
-        
-        try:
-            results = run_query(query, (program_studi, tahun, semester), fetch=True)
-            if results:
-                st.dataframe(results)
-            else:
-                st.warning("Tidak ada data angsuran yang lunas untuk kriteria tersebut.")
-        except Exception as e:
-            st.error(f"Terjadi kesalahan saat mengambil data: {str(e)}")
-
-def laporan_belum_lunas():
-    st.header("Laporan Angsuran Belum Lunas")
-    
-    program_studi = st.selectbox("Program Studi", [
-        "Teknik Informatika", 
-        "Teknik Mesin", 
-        "Teknik Industri", 
-        "Teknik Tekstil", 
-        "Teknik BOM"
-    ])
-    tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
-    semester = st.selectbox("Semester", ["Ganjil", "Genap"])
-    
-    if st.button("Cari Belum Lunas"):
-        # Query untuk mendapatkan angsuran yang belum lunas
-        query = '''
-            SELECT nim, nama, angsuran_ke, jumlah_bayar, tanggal_pembayaran
-            FROM angsuran_kuliah
-            WHERE program_studi = %s AND tahun = %s AND semester = %s
-            GROUP BY nim, nama, angsuran_ke, jumlah_bayar, tanggal_pembayaran
-            HAVING SUM(jumlah_bayar) < (SELECT biaya_total FROM biaya_kuliah WHERE nim = angsuran_kuliah.nim)
-        '''
-        
-        try:
-            results = run_query(query, (program_studi, tahun, semester), fetch=True)
-            if results:
-                st.dataframe(results)
-            else:
-                st.warning("Tidak ada data angsuran yang belum lunas untuk kriteria tersebut.")
-        except Exception as e:
-            st.error(f"Terjadi kesalahan saat mengambil data: {str(e)}")
-
 
 # Navigasi
 menu = st.sidebar.radio("Menu", [
