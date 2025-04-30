@@ -95,7 +95,7 @@ def home():
 
     # ===== HEADER SECTION =====
     logo_url = get_logo()
-    st.image(logo_url, width=150)
+    st.image("https://www.bing.com/images/search?view=detailV2&ccid=k4qymdgk&id=F735D60403E14B222787ACBF3EB546239317521A&thid=OIP.k4qymdgkGfy_j-IGRTlOwAAAAA&mediaurl=https%3a%2f%2fakupintar.id%2fdocuments%2f20143%2f0%2fSekolah%2bTinggi%2bTeknologi%2bWastukancana.jpg%2fb4e38a76-26b4-1eab-1c02-bcf6b7b14ec5%3fversion%3d1.0%26t%3d1538207623703%26imageThumbnail%3d1&exph=300&expw=300&q=logo+stt+wastukancana&simid=608051711060566321&FORM=IRPRST&ck=F7BC0B184BE794CF5AE1AD9919E293B9&selectedIndex=0&itb=0", width=150)
     st.markdown('<p class="main-title">🎓 Sistem Pembayaran Kuliah</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-title">STT Wastukancana</p>', unsafe_allow_html=True)
     
@@ -338,7 +338,6 @@ def laporan_belum_lunas():
 # Main App
 def main():
     # Sidebar navigation
-    st.sidebar.image(get_logo(), width=120)
     st.sidebar.title("Menu Navigasi")
     
     # Using radio buttons for navigation
