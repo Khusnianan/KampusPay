@@ -19,8 +19,11 @@ def run_query(query, params=None, fetch=False):
     data = None
     columns = [desc[0] for desc in cur.description]
     if fetch:
-        rows = cur.fetchall()
-        data = pd.DataFrame(rows, columns=columns)
+        rows = cur.fetchall()  # Mengambil hasil query
+        if rows:  # Pastikan rows tidak kosong
+            data = pd.DataFrame(rows, columns=columns)  # Buat DataFrame dengan nama kolom
+        else:
+            data = pd.DataFrame()
     conn.commit()
     cur.close()
     conn.close()
@@ -76,8 +79,8 @@ def input_biaya_kuliah():
             # Cari data berdasarkan NIM
             query = '''SELECT * FROM biaya_kuliah WHERE nim = %s'''
             results = run_query(query, (nim,), fetch=True)
-            if results:
-                st.dataframe(results)
+            if not results.empty:
+                st.dataframe(results, use_container_width=True)
             else:
                 st.warning("Data tidak ditemukan.")
         
@@ -134,8 +137,8 @@ def bayar_angsuran():
             # Cari data berdasarkan NIM dan angsuran ke-
             query = '''SELECT * FROM angsuran_kuliah WHERE nim = %s AND angsuran_ke = %s'''
             results = run_query(query, (nim, angsuran_ke), fetch=True)
-            if results:
-                st.dataframe(results)
+            if not results.empty:
+                st.dataframe(results, use_container_width=True)
             else:
                 st.warning("Data angsuran tidak ditemukan.")
         
