@@ -27,7 +27,6 @@ def run_query(query, params=None, fetch=False):
 # Halaman: Home
 def home():
     st.title("🎓 Sistem Pembayaran Uang Kuliah Mahasiswa")
-    st.image("https://images.unsplash.com/photo-1571260899304-425eee4c7efc", use_column_width=True)
     st.markdown("""
         Selamat datang di sistem manajemen pembayaran kuliah. Anda dapat:
 
@@ -169,7 +168,7 @@ def cari_angsuran():
 def laporan_lunas():
     st.header("Laporan Angsuran Lunas")
     
-    program_studi = st.radio("Program Studi", [
+    program_studi = st.selectbox("Program Studi", [
         "Teknik Informatika", 
         "Teknik Mesin", 
         "Teknik Industri", 
@@ -201,7 +200,7 @@ def laporan_lunas():
 def laporan_belum_lunas():
     st.header("Laporan Angsuran Belum Lunas")
     
-    program_studi = st.radio("Program Studi", [
+    program_studi = st.selectbox("Program Studi", [
         "Teknik Informatika", 
         "Teknik Mesin", 
         "Teknik Industri", 
