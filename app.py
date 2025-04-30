@@ -40,7 +40,13 @@ def home():
 def input_biaya_kuliah():
     st.header("Input Biaya Kuliah")
     with st.form("form_biaya"):
-        program_studi = st.text_input("Program Studi")
+        program_studi = st.selectbox("Program Studi", [
+            "Teknik Informatika", 
+            "Teknik Mesin", 
+            "Teknik Industri", 
+            "Teknik Tekstil", 
+            "Teknik BOM"
+        ])
         nim = st.text_input("NIM")
         nama = st.text_input("Nama")
         sks_kuliah = st.number_input("SKS Kuliah", min_value=0)
@@ -60,7 +66,13 @@ def input_biaya_kuliah():
 def bayar_angsuran():
     st.header("Bayar Angsuran Biaya Kuliah")
     with st.form("form_angsuran"):
-        program_studi = st.text_input("Program Studi")
+        program_studi = st.selectbox("Program Studi", [
+            "Teknik Informatika", 
+            "Teknik Mesin", 
+            "Teknik Industri", 
+            "Teknik Tekstil", 
+            "Teknik BOM"
+        ])
         nim = st.text_input("NIM")
         nama = st.text_input("Nama")
         angsuran_ke = st.number_input("Angsuran Ke-", min_value=1)
@@ -77,48 +89,16 @@ def bayar_angsuran():
             run_query(query, (program_studi, nim, nama, angsuran_ke, tahun, semester, tanggal, bayar))
             st.success("Pembayaran angsuran berhasil disimpan.")
 
-# Halaman: Laporan Pembayaran Sudah Lunas
-def laporan_lunas():
-    st.header("Laporan Mahasiswa Lunas")
-    program_studi = st.text_input("Program Studi")
-    tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
-    semester = st.selectbox("Semester", ["Ganjil", "Genap"])
-
-    if st.button("Cari"):
-        query = '''
-        SELECT b.nim, b.nama, b.biaya_total, SUM(a.jumlah_bayar) AS total_bayar
-        FROM biaya_kuliah b
-        JOIN angsuran_kuliah a ON a.nim = b.nim
-        WHERE b.program_studi = %s AND b.tahun = %s AND b.semester = %s
-        GROUP BY b.nim, b.nama, b.biaya_total
-        HAVING SUM(a.jumlah_bayar) >= b.biaya_total
-        '''
-        results = run_query(query, (program_studi, tahun, semester), fetch=True)
-        st.dataframe(results, use_container_width=True)
-
-# Halaman: Laporan Belum Lunas
-def laporan_belum_lunas():
-    st.header("Laporan Mahasiswa Belum Lunas")
-    program_studi = st.text_input("Program Studi")
-    tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
-    semester = st.selectbox("Semester", ["Ganjil", "Genap"])
-
-    if st.button("Cari"):
-        query = '''
-        SELECT b.nim, b.nama, b.biaya_total, COALESCE(SUM(a.jumlah_bayar), 0) AS total_bayar
-        FROM biaya_kuliah b
-        LEFT JOIN angsuran_kuliah a ON a.nim = b.nim
-        WHERE b.program_studi = %s AND b.tahun = %s AND b.semester = %s
-        GROUP BY b.nim, b.nama, b.biaya_total
-        HAVING COALESCE(SUM(a.jumlah_bayar), 0) < b.biaya_total
-        '''
-        results = run_query(query, (program_studi, tahun, semester), fetch=True)
-        st.dataframe(results, use_container_width=True)
-
 # Halaman: Pencarian Angsuran
 def cari_angsuran():
     st.header("Pencarian Angsuran Biaya Kuliah")
-    program_studi = st.text_input("Program Studi")
+    program_studi = st.selectbox("Program Studi", [
+        "Teknik Informatika", 
+        "Teknik Mesin", 
+        "Teknik Industri", 
+        "Teknik Tekstil", 
+        "Teknik BOM"
+    ])
     tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
     semester = st.selectbox("Semester", ["Ganjil", "Genap"])
     tanggal = st.date_input("Tanggal")
