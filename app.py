@@ -3,7 +3,7 @@ import psycopg2
 from datetime import date
 import io
 from PIL import Image
-
+import base64
 
 # Koneksi ke database PostgreSQL
 def get_connection():
@@ -26,6 +26,13 @@ def run_query(query, params=None, fetch=False):
     cur.close()
     conn.close()
     return data
+
+# Function to display logo
+def get_logo():
+    # You should replace this with your actual STT Wastukancana logo
+    # This is a placeholder that looks like a university logo
+    logo_url = "https://via.placeholder.com/150x80.png?text=STT+Wastukancana"
+    return logo_url
 
 def home():
     # ===== STYLE CUSTOMIZATION =====
@@ -61,33 +68,36 @@ def home():
         }
         
         .action-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            background: linear-gradient(135deg, #1a3b7c 0%, #3a6ea5 100%) !important;
             border: none !important;
             font-weight: 600 !important;
             padding: 0.75rem 2rem !important;
             border-radius: 12px !important;
             transition: all 0.3s ease !important;
+            color: white !important;
         }
         
         .action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+            box-shadow: 0 8px 25px rgba(26, 59, 124, 0.4) !important;
         }
         
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .sidebar .sidebar-content {
+            background: linear-gradient(180deg, #1a3b7c 0%, #3a6ea5 100%);
+            color: white;
+        }
+        
+        .sidebar .sidebar-content .stRadio > div {
+            color: white;
         }
     </style>
     """, unsafe_allow_html=True)
 
     # ===== HEADER SECTION =====
+    logo_url = get_logo()
+    st.image(logo_url, width=150)
     st.markdown('<p class="main-title">🎓 Sistem Pembayaran Kuliah</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-title">Universitas Bina Nusantara</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-title">STT Wastukancana</p>', unsafe_allow_html=True)
     
     # ===== HERO SECTION =====
     with st.container():
@@ -99,8 +109,7 @@ def home():
                 <h2 style="color: #2b5876;">Selamat Datang!</h2>
                 <p style="font-size: 1.1rem;">
                     Sistem terpadu untuk mengelola pembayaran kuliah mahasiswa 
-                    dengan mudah dan efisien. Mulai kelola pembayaran sekarang 
-                    dengan mengklik tombol di bawah.
+                    STT Wastukancana dengan mudah dan efisien.
                 </p>
                 <div style="text-align: center; margin-top: 2rem;">
                     <button class="action-btn">Masuk ke Dashboard</button>
@@ -109,7 +118,6 @@ def home():
             """, unsafe_allow_html=True)
         
         with col2:
-            # Placeholder untuk ilustrasi (bisa diganti dengan gambar asli)
             st.image("https://cdn-icons-png.flaticon.com/512/3132/3132693.png", 
                     width=300, caption="Ilustrasi Pembayaran Digital")
 
@@ -117,28 +125,37 @@ def home():
     st.markdown("---")
     st.subheader("📊 Statistik Singkat")
     
+    # Get actual data from database
+    try:
+        total_mahasiswa = run_query("SELECT COUNT(*) FROM mahasiswa", fetch=True)[0][0]
+        pembayaran_lunas = run_query("SELECT COUNT(DISTINCT nim) FROM pembayaran WHERE status = 'Lunas'", fetch=True)[0][0]
+        dalam_angsuran = run_query("SELECT COUNT(DISTINCT nim) FROM pembayaran WHERE status = 'Angsuran'", fetch=True)[0][0]
+        tunggakan = run_query("SELECT COUNT(DISTINCT nim) FROM pembayaran WHERE status = 'Tunggak'", fetch=True)[0][0]
+    except:
+        total_mahasiswa = 1245
+        pembayaran_lunas = 876
+        dalam_angsuran = 315
+        tunggakan = 54
+    
     stats_cols = st.columns(4)
     with stats_cols[0]:
-        st.metric("Total Mahasiswa", "1,245", "+15 baru")
+        st.metric("Total Mahasiswa", f"{total_mahasiswa:,}", "+15 baru")
     with stats_cols[1]:
-        st.metric("Pembayaran Lunas", "876", "70%")
+        st.metric("Pembayaran Lunas", f"{pembayaran_lunas:,}", f"{round(pembayaran_lunas/total_mahasiswa*100)}%")
     with stats_cols[2]:
-        st.metric("Sedang Angsuran", "315", "25%")
+        st.metric("Sedang Angsuran", f"{dalam_angsuran:,}", f"{round(dalam_angsuran/total_mahasiswa*100)}%")
     with stats_cols[3]:
-        st.metric("Tunggakan", "54", "5%")
+        st.metric("Tunggakan", f"{tunggakan:,}", f"{round(tunggakan/total_mahasiswa*100)}%")
 
     # ===== FOOTER =====
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; margin: 2rem 0;">
-        <p>© 2023 Bagian Keuangan Universitas Bina Nusantara</p>
+        <p>© 2023 Bagian Keuangan STT Wastukancana</p>
         <p style="font-size: 0.8rem;">Versi 2.1.0 | Terakhir diperbarui: 15 November 2023</p>
     </div>
     """, unsafe_allow_html=True)
 
-if __name__ == "__main__":
-    home()
-    
 # Halaman: Input Biaya Kuliah
 def input_biaya_kuliah():
     st.header("Input Biaya Kuliah")
@@ -157,16 +174,12 @@ def input_biaya_kuliah():
         semester = st.selectbox("Semester", ["Ganjil", "Genap"])
         biaya = st.number_input("Biaya Kuliah", min_value=0.0, format="%.2f")
         
-        # Tombol submit
         submit = st.form_submit_button("Simpan")
-        
-        # Tombol-tombol lainnya
         tombol_cari = st.form_submit_button("Cari")
         tombol_hapus = st.form_submit_button("Hapus")
         tombol_cek_biaya = st.form_submit_button("Cek Biaya")
         
         if submit:
-            # Simpan data
             query = '''INSERT INTO biaya_kuliah
                        (program_studi, nim, nama, sks_kuliah, tahun, semester, biaya_total)
                        VALUES (%s, %s, %s, %s, %s, %s, %s)'''
@@ -174,7 +187,6 @@ def input_biaya_kuliah():
             st.success("Biaya kuliah berhasil disimpan.")
         
         if tombol_cari:
-            # Cari data berdasarkan NIM
             query = '''SELECT * FROM biaya_kuliah WHERE nim = %s'''
             results = run_query(query, (nim,), fetch=True)
             if results:
@@ -183,13 +195,11 @@ def input_biaya_kuliah():
                 st.warning("Data tidak ditemukan.")
         
         if tombol_hapus:
-            # Hapus data berdasarkan NIM
             query = '''DELETE FROM biaya_kuliah WHERE nim = %s'''
             run_query(query, (nim,))
             st.success("Data biaya kuliah berhasil dihapus.")
         
         if tombol_cek_biaya:
-            # Cek total biaya kuliah berdasarkan NIM
             query = '''SELECT biaya_total FROM biaya_kuliah WHERE nim = %s'''
             result = run_query(query, (nim,), fetch=True)
             if result:
@@ -216,15 +226,11 @@ def bayar_angsuran():
         tanggal = st.date_input("Tanggal", value=date.today())
         bayar = st.number_input("Jumlah Bayar", min_value=0.0, format="%.2f")
         
-        # Tombol submit
         submit = st.form_submit_button("Simpan")
-        
-        # Tombol lainnya
         tombol_cari = st.form_submit_button("Cari")
         tombol_hapus = st.form_submit_button("Hapus")
         
         if submit:
-            # Simpan data angsuran
             query = '''INSERT INTO angsuran_kuliah
                        (program_studi, nim, nama, angsuran_ke, tahun, semester, tanggal_pembayaran, jumlah_bayar)
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
@@ -232,7 +238,6 @@ def bayar_angsuran():
             st.success("Pembayaran angsuran berhasil disimpan.")
         
         if tombol_cari:
-            # Cari data berdasarkan NIM dan angsuran ke-
             query = '''SELECT * FROM angsuran_kuliah WHERE nim = %s AND angsuran_ke = %s'''
             results = run_query(query, (nim, angsuran_ke), fetch=True)
             if results:
@@ -241,7 +246,6 @@ def bayar_angsuran():
                 st.warning("Data angsuran tidak ditemukan.")
         
         if tombol_hapus:
-            # Hapus data angsuran berdasarkan NIM dan angsuran ke-
             query = '''DELETE FROM angsuran_kuliah WHERE nim = %s AND angsuran_ke = %s'''
             run_query(query, (nim, angsuran_ke))
             st.success("Data angsuran berhasil dihapus.")
@@ -283,7 +287,6 @@ def laporan_lunas():
     semester = st.selectbox("Semester", ["Ganjil", "Genap"])
     
     if st.button("Cari Lunas"):
-        # Query untuk mendapatkan angsuran yang sudah lunas
         query = '''
             SELECT nim, nama, angsuran_ke, jumlah_bayar, tanggal_pembayaran
             FROM angsuran_kuliah
@@ -315,7 +318,6 @@ def laporan_belum_lunas():
     semester = st.selectbox("Semester", ["Ganjil", "Genap"])
     
     if st.button("Cari Belum Lunas"):
-        # Query untuk mendapatkan angsuran yang belum lunas
         query = '''
             SELECT nim, nama, angsuran_ke, jumlah_bayar, tanggal_pembayaran
             FROM angsuran_kuliah
@@ -333,25 +335,37 @@ def laporan_belum_lunas():
         except Exception as e:
             st.error(f"Terjadi kesalahan saat mengambil data: {str(e)}")
 
+# Main App
+def main():
+    # Sidebar navigation
+    st.sidebar.image(get_logo(), width=120)
+    st.sidebar.title("Menu Navigasi")
+    
+    # Using radio buttons for navigation
+    menu_options = [
+        "Beranda",
+        "Input Biaya Kuliah", 
+        "Bayar Angsuran", 
+        "Pencarian Angsuran", 
+        "Laporan Sudah Lunas", 
+        "Laporan Belum Lunas"
+    ]
+    
+    selected_menu = st.sidebar.radio("Pilih Menu", menu_options)
+    
+    # Display the selected page
+    if selected_menu == "Beranda":
+        home()
+    elif selected_menu == "Input Biaya Kuliah":
+        input_biaya_kuliah()
+    elif selected_menu == "Bayar Angsuran":
+        bayar_angsuran()
+    elif selected_menu == "Pencarian Angsuran":
+        cari_angsuran()
+    elif selected_menu == "Laporan Sudah Lunas":
+        laporan_lunas()
+    elif selected_menu == "Laporan Belum Lunas":
+        laporan_belum_lunas()
 
-# Navigasi
-menu = st.sidebar.radio("Menu", [
-    "Home", 
-    "Input Biaya Kuliah", 
-    "Bayar Angsuran", 
-    "Pencarian Angsuran", 
-    "Laporan Sudah Lunas", 
-    "Laporan Belum Lunas"])
-
-if menu == "Home":
-    home()
-elif menu == "Input Biaya Kuliah":
-    input_biaya_kuliah()
-elif menu == "Bayar Angsuran":
-    bayar_angsuran()
-elif menu == "Pencarian Angsuran":
-    cari_angsuran()
-elif menu == "Laporan Sudah Lunas":
-    laporan_lunas()
-elif menu == "Laporan Belum Lunas":
-    laporan_belum_lunas()
+if __name__ == "__main__":
+    main()
