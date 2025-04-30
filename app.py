@@ -6,6 +6,7 @@ st.set_page_config(page_title="Sistem Pembayaran Kuliah", layout="wide")
 st.title("📚 Sistem Pembayaran Uang Kuliah Mahasiswa")
 
 menu = st.sidebar.radio("Menu", [
+    "Home",
     "Input Biaya Kuliah",
     "Bayar Angsuran",
     "Pencarian Pembayaran",
@@ -13,7 +14,26 @@ menu = st.sidebar.radio("Menu", [
     "Laporan Belum Lunas"
 ])
 
-if menu == "Input Biaya Kuliah":
+if menu == "Home":
+    st.markdown("## 🏫 Selamat Datang di Sistem Pembayaran Uang Kuliah Mahasiswa")
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Graduation_hat.svg/800px-Graduation_hat.svg.png", width=150)
+    
+    st.markdown("""
+    Sistem ini membantu administrasi kampus dalam mencatat dan mengelola:
+    
+    - 💰 **Input Biaya Kuliah** berdasarkan jumlah SKS, tahun, dan semester.
+    - 💳 **Pembayaran Angsuran** oleh mahasiswa dengan sistem cicilan.
+    - 🔍 **Pencarian Riwayat Pembayaran** berdasarkan berbagai filter waktu dan identitas.
+    - ✅ **Laporan Mahasiswa yang Sudah Lunas**.
+    - ❌ **Laporan Mahasiswa yang Belum Lunas**.
+
+    ---
+    **Catatan:** Data yang dimasukkan saat ini *belum disimpan secara permanen* (tanpa database). Cocok untuk simulasi & pengujian awal.
+    
+    Jika Anda adalah admin keuangan kampus, silakan mulai dari menu samping.
+    """)
+
+elif menu == "Input Biaya Kuliah":
     st.header("💰 Input Biaya Kuliah")
     col1, col2 = st.columns(2)
     with col1:
