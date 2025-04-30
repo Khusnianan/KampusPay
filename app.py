@@ -17,8 +17,10 @@ def run_query(query, params=None, fetch=False):
     cur = conn.cursor()
     cur.execute(query, params)
     data = None
+    columns = [desc[0] for desc in cur.description]
     if fetch:
-        data = cur.fetchall()
+        rows = cur.fetchall()
+        data = pd.DataFrame(rows, columns=columns)
     conn.commit()
     cur.close()
     conn.close()
@@ -169,7 +171,7 @@ def cari_angsuran():
 def laporan_lunas():
     st.header("Laporan Angsuran Lunas")
     
-    program_studi = st.radio("Program Studi", [
+    program_studi = st.selectbox("Program Studi", [
         "Teknik Informatika", 
         "Teknik Mesin", 
         "Teknik Industri", 
@@ -201,7 +203,7 @@ def laporan_lunas():
 def laporan_belum_lunas():
     st.header("Laporan Angsuran Belum Lunas")
     
-    program_studi = st.radio("Program Studi", [
+    program_studi = st.selectbox("Program Studi", [
         "Teknik Informatika", 
         "Teknik Mesin", 
         "Teknik Industri", 
