@@ -27,12 +27,7 @@ def run_query(query, params=None, fetch=False):
     conn.close()
     return data
 
-# Function to display logo
-def get_logo():
-    # You should replace this with your actual STT Wastukancana logo
-    # This is a placeholder that looks like a university logo
-    logo_url = "https://www.bing.com/images/search?view=detailV2&ccid=k4qymdgk&id=F735D60403E14B222787ACBF3EB546239317521A&thid=OIP.k4qymdgkGfy_j-IGRTlOwAAAAA&mediaurl=https%3a%2f%2fakupintar.id%2fdocuments%2f20143%2f0%2fSekolah%2bTinggi%2bTeknologi%2bWastukancana.jpg%2fb4e38a76-26b4-1eab-1c02-bcf6b7b14ec5%3fversion%3d1.0%26t%3d1538207623703%26imageThumbnail%3d1&exph=300&expw=300&q=logo+stt+wastukancana&simid=608051711060566321&FORM=IRPRST&ck=F7BC0B184BE794CF5AE1AD9919E293B9&selectedIndex=0&itb=0"
-    return logo_url
+
 
 def home():
     # ===== STYLE CUSTOMIZATION =====
