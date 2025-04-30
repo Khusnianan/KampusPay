@@ -1,6 +1,9 @@
 import streamlit as st
 import psycopg2
 from datetime import date
+import io
+from PIL import Image
+
 
 # Koneksi ke database PostgreSQL
 def get_connection():
@@ -24,50 +27,118 @@ def run_query(query, params=None, fetch=False):
     conn.close()
     return data
 
-# Halaman: Home
 def home():
-    # Konfigurasi tampilan
-    st.set_page_config(layout="centered")
-    
-    # Header utama dengan spacing yang baik
-    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
-    st.title("Sistem Pembayaran Kuliah")
-    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-    st.subheader("Universitas Bina Nusantara")  # Ganti dengan nama universitas
-    
-    # Garis pemisah estetik
-    st.markdown("---")
-    
-    # Gambar ilustrasi (opsional)
-    # st.image("payment_illustration.png", width=300)  # Uncomment jika punya gambar
-    
-    # Pesan sambutan singkat
+    # ===== STYLE CUSTOMIZATION =====
     st.markdown("""
-    <div style='text-align: center; margin: 40px 0;'>
-        <p style='font-size: 18px;'>
-            Selamat datang di sistem pembayaran kuliah terpadu.
-            <br>Gunakan menu di sidebar untuk mulai.
-        </p>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .main-title {
+            color: #2b5876;
+            font-size: 2.8rem !important;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sub-title {
+            color: #4e4376;
+            font-size: 1.2rem !important;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .welcome-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border: none !important;
+            font-weight: 600 !important;
+            padding: 0.75rem 2rem !important;
+            border-radius: 12px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ===== HEADER SECTION =====
+    st.markdown('<p class="main-title">🎓 Sistem Pembayaran Kuliah</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-title">Universitas Bina Nusantara</p>', unsafe_allow_html=True)
+    
+    # ===== HERO SECTION =====
+    with st.container():
+        col1, col2 = st.columns([1.5, 1])
+        
+        with col1:
+            st.markdown("""
+            <div class="welcome-card">
+                <h2 style="color: #2b5876;">Selamat Datang!</h2>
+                <p style="font-size: 1.1rem;">
+                    Sistem terpadu untuk mengelola pembayaran kuliah mahasiswa 
+                    dengan mudah dan efisien. Mulai kelola pembayaran sekarang 
+                    dengan mengklik tombol di bawah.
+                </p>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="action-btn">Masuk ke Dashboard</button>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            # Placeholder untuk ilustrasi (bisa diganti dengan gambar asli)
+            st.image("https://cdn-icons-png.flaticon.com/512/3132/3132693.png", 
+                    width=300, caption="Ilustrasi Pembayaran Digital")
+
+    # ===== QUICK STATS SECTION =====
+    st.markdown("---")
+    st.subheader("📊 Statistik Singkat")
+    
+    stats_cols = st.columns(4)
+    with stats_cols[0]:
+        st.metric("Total Mahasiswa", "1,245", "+15 baru")
+    with stats_cols[1]:
+        st.metric("Pembayaran Lunas", "876", "70%")
+    with stats_cols[2]:
+        st.metric("Sedang Angsuran", "315", "25%")
+    with stats_cols[3]:
+        st.metric("Tunggakan", "54", "5%")
+
+    # ===== FOOTER =====
+    st.markdown("---")
+    st.markdown("""
+    <div style="text-align: center; color: #666; margin: 2rem 0;">
+        <p>© 2023 Bagian Keuangan Universitas Bina Nusantara</p>
+        <p style="font-size: 0.8rem;">Versi 2.1.0 | Terakhir diperbarui: 15 November 2023</p>
     </div>
     """, unsafe_allow_html=True)
-    
-    # Tombol aksi utama
-    col1, col2, col3 = st.columns([1,2,1])
-    with col2:
-        if st.button("**Masuk ke Sistem**", type="primary", use_container_width=True):
-            st.switch_page("/dashboard")  # Ganti dengan halaman tujuan
-    
-    # Footer sederhana
-    st.markdown("---")
-    st.markdown(
-        "<div style='text-align: center; color: #666; margin-top: 50px;'>"
-        "© 2023 Universitas Bina Nusantara - Bagian Keuangan"
-        "</div>", 
-        unsafe_allow_html=True
-    )
 
 if __name__ == "__main__":
     home()
+    
 # Halaman: Input Biaya Kuliah
 def input_biaya_kuliah():
     st.header("Input Biaya Kuliah")
