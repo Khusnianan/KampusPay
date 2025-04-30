@@ -16,14 +16,22 @@ def run_query(query, params=None, fetch=False):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(query, params)
-    data = None
     columns = [desc[0] for desc in cur.description]
-    if fetch:
-        rows = cur.fetchall()  # Mengambil hasil query
-        if rows:  # Pastikan rows tidak kosong
-            data = pd.DataFrame(rows, columns=columns)  # Buat DataFrame dengan nama kolom
-        else:
-            data = pd.DataFrame()
+if not fetch:
+        conn.commit()
+        cur.close()
+        conn.close()
+        return None
+    
+    # Jika query membutuhkan hasil (SELECT), ambil deskripsi kolom dan hasilnya
+    columns = [desc[0] for desc in cur.description] if cur.description else []
+    rows = cur.fetchall()  # Mengambil hasil query
+    
+    if rows:  # Pastikan rows tidak kosong
+        data = pd.DataFrame(rows, columns=columns)  # Membuat DataFrame dengan nama kolom
+    else:
+        data = pd.DataFrame()  # Jika tidak ada data, kembalikan DataFrame kosong
+    
     conn.commit()
     cur.close()
     conn.close()
