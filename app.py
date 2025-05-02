@@ -154,7 +154,7 @@ def home():
             """, unsafe_allow_html=True)
         
         with col2:
-            st.image("https://iconscout.com/icons/education-fees-payment", 
+            st.image("https://iconscout.com/icon/graduation-fees-2907604_2409880", 
                     width=300, caption="Ilustrasi Pembayaran Digital")
 
     # ===== UPDATED STATISTICS SECTION =====
