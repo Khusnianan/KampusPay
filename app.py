@@ -154,7 +154,7 @@ def home():
             """, unsafe_allow_html=True)
         
         with col2:
-            st.image("https://www.flaticon.com/free-icons/tuition", 
+            st.image("https://iconscout.com/icons/education-fees-payment", 
                     width=300, caption="Ilustrasi Pembayaran Digital")
 
     # ===== UPDATED STATISTICS SECTION =====
