@@ -166,6 +166,202 @@ def main():
     ]
     
     selected_menu = st.sidebar.radio("Pilih Menu", menu_options)
+
+# Halaman: Input Biaya Kuliah
+def input_biaya_kuliah():
+    st.header("Input Biaya Kuliah")
+    with st.form("form_biaya"):
+        program_studi = st.selectbox("Program Studi", [
+            "Teknik Informatika", 
+            "Teknik Mesin", 
+            "Teknik Industri", 
+            "Teknik Tekstil", 
+            "Teknik BOM"
+        ])
+        nim = st.text_input("NIM")
+        nama = st.text_input("Nama")
+        sks_kuliah = st.number_input("SKS Kuliah", min_value=0)
+        tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
+        semester = st.selectbox("Semester", ["Ganjil", "Genap"])
+        biaya = st.number_input("Biaya Kuliah", min_value=0.0, format="%.2f")
+        
+        submit = st.form_submit_button("Simpan")
+        tombol_cari = st.form_submit_button("Cari")
+        tombol_hapus = st.form_submit_button("Hapus")
+        tombol_cek_biaya = st.form_submit_button("Cek Biaya")
+        
+        if submit:
+            query = '''INSERT INTO biaya_kuliah
+                       (program_studi, nim, nama, sks_kuliah, tahun, semester, biaya_total)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s)'''
+            run_query(query, (program_studi, nim, nama, sks_kuliah, tahun, semester, biaya))
+            st.success("Biaya kuliah berhasil disimpan.")
+        
+        if tombol_cari:
+            query = '''SELECT * FROM biaya_kuliah WHERE nim = %s'''
+            results = run_query(query, (nim,), fetch=True)
+            if results:
+                st.dataframe(results)
+            else:
+                st.warning("Data tidak ditemukan.")
+        
+        if tombol_hapus:
+            query = '''DELETE FROM biaya_kuliah WHERE nim = %s'''
+            run_query(query, (nim,))
+            st.success("Data biaya kuliah berhasil dihapus.")
+        
+        if tombol_cek_biaya:
+            query = '''SELECT biaya_total FROM biaya_kuliah WHERE nim = %s'''
+            result = run_query(query, (nim,), fetch=True)
+            if result:
+                st.write(f"Total Biaya Kuliah: Rp {result[0][0]:,.2f}")
+            else:
+                st.warning("Data biaya kuliah tidak ditemukan.")
+
+# Halaman: Bayar Angsuran Biaya Kuliah
+def bayar_angsuran():
+    st.header("Bayar Angsuran Biaya Kuliah")
+    with st.form("form_angsuran"):
+        program_studi = st.selectbox("Program Studi", [
+            "Teknik Informatika", 
+            "Teknik Mesin", 
+            "Teknik Industri", 
+            "Teknik Tekstil", 
+            "Teknik BOM"
+        ])
+        nim = st.text_input("NIM")
+        nama = st.text_input("Nama")
+        angsuran_ke = st.number_input("Angsuran Ke-", min_value=1)
+        tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
+        semester = st.selectbox("Semester", ["Ganjil", "Genap"])
+        tanggal = st.date_input("Tanggal", value=date.today())
+        bayar = st.number_input("Jumlah Bayar", min_value=0.0, format="%.2f")
+        
+        submit = st.form_submit_button("Simpan")
+        tombol_cari = st.form_submit_button("Cari")
+        tombol_hapus = st.form_submit_button("Hapus")
+        
+        if submit:
+            query = '''INSERT INTO angsuran_kuliah
+                       (program_studi, nim, nama, angsuran_ke, tahun, semester, tanggal_pembayaran, jumlah_bayar)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
+            run_query(query, (program_studi, nim, nama, angsuran_ke, tahun, semester, tanggal, bayar))
+            st.success("Pembayaran angsuran berhasil disimpan.")
+        
+        if tombol_cari:
+            query = '''SELECT * FROM angsuran_kuliah WHERE nim = %s AND angsuran_ke = %s'''
+            results = run_query(query, (nim, angsuran_ke), fetch=True)
+            if results:
+                st.dataframe(results)
+            else:
+                st.warning("Data angsuran tidak ditemukan.")
+        
+        if tombol_hapus:
+            query = '''DELETE FROM angsuran_kuliah WHERE nim = %s AND angsuran_ke = %s'''
+            run_query(query, (nim, angsuran_ke))
+            st.success("Data angsuran berhasil dihapus.")
+
+# Halaman: Pencarian Angsuran
+def cari_angsuran():
+    st.header("Pencarian Angsuran Biaya Kuliah")
+    program_studi = st.selectbox("Program Studi", [
+        "Teknik Informatika", 
+        "Teknik Mesin", 
+        "Teknik Industri", 
+        "Teknik Tekstil", 
+        "Teknik BOM"
+    ])
+    tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
+    semester = st.selectbox("Semester", ["Ganjil", "Genap"])
+    tanggal = st.date_input("Tanggal")
+
+    if st.button("Cari"):
+        query = '''
+        SELECT nim, nama, angsuran_ke, tanggal_pembayaran, jumlah_bayar
+        FROM angsuran_kuliah
+        WHERE program_studi = %s AND tahun = %s AND semester = %s AND tanggal_pembayaran = %s
+        '''
+        results = run_query(query, (program_studi, tahun, semester, tanggal), fetch=True)
+        st.dataframe(results, use_container_width=True)
+
+def laporan_lunas():
+    st.header("Laporan Angsuran Lunas")
+    
+    program_studi = st.selectbox("Program Studi", [
+        "Teknik Informatika", 
+        "Teknik Mesin", 
+        "Teknik Industri", 
+        "Teknik Tekstil", 
+        "Teknik BOM"
+    ])
+    tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
+    semester = st.selectbox("Semester", ["Ganjil", "Genap"])
+    
+    if st.button("Cari Lunas"):
+        query = '''
+            SELECT nim, nama, angsuran_ke, jumlah_bayar, tanggal_pembayaran
+            FROM angsuran_kuliah
+            WHERE program_studi = %s AND tahun = %s AND semester = %s
+            GROUP BY nim, nama, angsuran_ke, jumlah_bayar, tanggal_pembayaran
+            HAVING SUM(jumlah_bayar) >= (SELECT biaya_total FROM biaya_kuliah WHERE nim = angsuran_kuliah.nim)
+        '''
+        
+        try:
+            results = run_query(query, (program_studi, tahun, semester), fetch=True)
+            if results:
+                st.dataframe(results)
+            else:
+                st.warning("Tidak ada data angsuran yang lunas untuk kriteria tersebut.")
+        except Exception as e:
+            st.error(f"Terjadi kesalahan saat mengambil data: {str(e)}")
+
+def laporan_belum_lunas():
+    st.header("Laporan Angsuran Belum Lunas")
+    
+    program_studi = st.selectbox("Program Studi", [
+        "Teknik Informatika", 
+        "Teknik Mesin", 
+        "Teknik Industri", 
+        "Teknik Tekstil", 
+        "Teknik BOM"
+    ])
+    tahun = st.number_input("Tahun", min_value=2000, max_value=2100)
+    semester = st.selectbox("Semester", ["Ganjil", "Genap"])
+    
+    if st.button("Cari Belum Lunas"):
+        query = '''
+            SELECT nim, nama, angsuran_ke, jumlah_bayar, tanggal_pembayaran
+            FROM angsuran_kuliah
+            WHERE program_studi = %s AND tahun = %s AND semester = %s
+            GROUP BY nim, nama, angsuran_ke, jumlah_bayar, tanggal_pembayaran
+            HAVING SUM(jumlah_bayar) < (SELECT biaya_total FROM biaya_kuliah WHERE nim = angsuran_kuliah.nim)
+        '''
+        
+        try:
+            results = run_query(query, (program_studi, tahun, semester), fetch=True)
+            if results:
+                st.dataframe(results)
+            else:
+                st.warning("Tidak ada data angsuran yang belum lunas untuk kriteria tersebut.")
+        except Exception as e:
+            st.error(f"Terjadi kesalahan saat mengambil data: {str(e)}")
+
+# Main App
+def main():
+    # Sidebar navigation
+    st.sidebar.title("Menu Navigasi")
+    
+    # Using radio buttons for navigation
+    menu_options = [
+        "Beranda",
+        "Input Biaya Kuliah", 
+        "Bayar Angsuran", 
+        "Pencarian Angsuran", 
+        "Laporan Sudah Lunas", 
+        "Laporan Belum Lunas"
+    ]
+    
+    selected_menu = st.sidebar.radio("Pilih Menu", menu_options)
     
     # Display the selected page
     if selected_menu == "Beranda":
