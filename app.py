@@ -1,4 +1,6 @@
 import streamlit as st
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import psycopg2
 from datetime import date
 import io
@@ -27,13 +29,49 @@ def run_query(query, params=None, fetch=False):
     conn.close()
     return data
 
-# Function to display logo
-def get_logo():
-    # You should replace this with your actual STT Wastukancana logo
-    # This is a placeholder that looks like a university logo
-    logo_url = "https://www.bing.com/images/search?view=detailV2&ccid=k4qymdgk&id=F735D60403E14B222787ACBF3EB546239317521A&thid=OIP.k4qymdgkGfy_j-IGRTlOwAAAAA&mediaurl=https%3a%2f%2fakupintar.id%2fdocuments%2f20143%2f0%2fSekolah%2bTinggi%2bTeknologi%2bWastukancana.jpg%2fb4e38a76-26b4-1eab-1c02-bcf6b7b14ec5%3fversion%3d1.0%26t%3d1538207623703%26imageThumbnail%3d1&exph=300&expw=300&q=logo+stt+wastukancana&simid=608051711060566321&FORM=IRPRST&ck=F7BC0B184BE794CF5AE1AD9919E293B9&selectedIndex=0&itb=0"
-    return logo_url
+# Function to create an engaging statistics section without showing student counts
+def statistics_section():
+    st.markdown("### 📊 Statistik Pembayaran")
 
+    # Sample data for each category (using percentages directly)
+    perc_lunas = 70  # Percentage of "Lunas" (Paid)
+    perc_angsuran = 20  # Percentage of "Angsuran" (Installment)
+    perc_tunggakan = 10  # Percentage of "Tunggakan" (Overdue)
+
+    # Pie chart to display payment categories distribution
+    fig = make_subplots(rows=1, cols=1, specs=[[{'type': 'pie'}]])
+
+    fig.add_trace(
+        go.Pie(
+            labels=["Lunas", "Angsuran", "Tunggakan"],
+            values=[perc_lunas, perc_angsuran, perc_tunggakan],
+            hole=0.4,
+            textinfo="label+percent",
+            marker=dict(colors=["#28a745", "#ffc107", "#dc3545"]),
+        )
+    )
+
+    fig.update_layout(
+        title="Distribusi Pembayaran",
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        showlegend=True
+    )
+
+    # Display pie chart
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Progress Bars with Categories
+    st.markdown("<h3 style='color: #28a745;'>📈 Pembayaran Lunas</h3>", unsafe_allow_html=True)
+    st.progress(perc_lunas / 100, text=f"{perc_lunas:.2f}% Lunas")
+    
+    st.markdown("<h3 style='color: #ffc107;'>📊 Sedang Angsuran</h3>", unsafe_allow_html=True)
+    st.progress(perc_angsuran / 100, text=f"{perc_angsuran:.2f}% Angsuran")
+
+    st.markdown("<h3 style='color: #dc3545;'>🚨 Tunggakan</h3>", unsafe_allow_html=True)
+    st.progress(perc_tunggakan / 100, text=f"{perc_tunggakan:.2f}% Tunggakan")
+
+# Incorporate it in your main home function
 def home():
     # ===== STYLE CUSTOMIZATION =====
     st.markdown("""
@@ -95,7 +133,7 @@ def home():
 
     # ===== HEADER SECTION =====
     logo_url = get_logo()
-    st.image("https://www.bing.com/images/search?view=detailV2&ccid=k4qymdgk&id=F735D60403E14B222787ACBF3EB546239317521A&thid=OIP.k4qymdgkGfy_j-IGRTlOwAAAAA&mediaurl=https%3a%2f%2fakupintar.id%2fdocuments%2f20143%2f0%2fSekolah%2bTinggi%2bTeknologi%2bWastukancana.jpg%2fb4e38a76-26b4-1eab-1c02-bcf6b7b14ec5%3fversion%3d1.0%26t%3d1538207623703%26imageThumbnail%3d1&exph=300&expw=300&q=logo+stt+wastukancana&simid=608051711060566321&FORM=IRPRST&ck=F7BC0B184BE794CF5AE1AD9919E293B9&selectedIndex=0&itb=0", width=150)
+    st.image(logo_url, width=150)
     st.markdown('<p class="main-title">🎓 Sistem Pembayaran Kuliah</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-title">STT Wastukancana</p>', unsafe_allow_html=True)
     
@@ -121,38 +159,15 @@ def home():
             st.image("https://cdn-icons-png.flaticon.com/512/3132/3132693.png", 
                     width=300, caption="Ilustrasi Pembayaran Digital")
 
-    # ===== QUICK STATS SECTION =====
-    st.markdown("---")
-    st.subheader("📊 Statistik Singkat")
-    
-    # Get actual data from database
-    try:
-        total_mahasiswa = run_query("SELECT COUNT(*) FROM mahasiswa", fetch=True)[0][0]
-        pembayaran_lunas = run_query("SELECT COUNT(DISTINCT nim) FROM pembayaran WHERE status = 'Lunas'", fetch=True)[0][0]
-        dalam_angsuran = run_query("SELECT COUNT(DISTINCT nim) FROM pembayaran WHERE status = 'Angsuran'", fetch=True)[0][0]
-        tunggakan = run_query("SELECT COUNT(DISTINCT nim) FROM pembayaran WHERE status = 'Tunggak'", fetch=True)[0][0]
-    except:
-        total_mahasiswa = 1245
-        pembayaran_lunas = 876
-        dalam_angsuran = 315
-        tunggakan = 54
-    
-    stats_cols = st.columns(4)
-    with stats_cols[0]:
-        st.metric("Total Mahasiswa", f"{total_mahasiswa:,}", "+15 baru")
-    with stats_cols[1]:
-        st.metric("Pembayaran Lunas", f"{pembayaran_lunas:,}", f"{round(pembayaran_lunas/total_mahasiswa*100)}%")
-    with stats_cols[2]:
-        st.metric("Sedang Angsuran", f"{dalam_angsuran:,}", f"{round(dalam_angsuran/total_mahasiswa*100)}%")
-    with stats_cols[3]:
-        st.metric("Tunggakan", f"{tunggakan:,}", f"{round(tunggakan/total_mahasiswa*100)}%")
+    # ===== UPDATED STATISTICS SECTION =====
+    statistics_section()
 
     # ===== FOOTER =====
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; margin: 2rem 0;">
         <p>© 2023 Bagian Keuangan STT Wastukancana</p>
-        <p style="font-size: 0.8rem;">Versi 2.1.0 | Terakhir diperbarui: 15 November 2023</p>
+        <p style="font-size: 0.8rem;">Versi 2.1.0 | Terakhir diperbarui: 30 April 2025</p>
     </div>
     """, unsafe_allow_html=True)
 
