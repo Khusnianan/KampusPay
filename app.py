@@ -127,7 +127,7 @@ def home():
                     labels=["Lunas","Angsuran","Tunggakan"],
                     values=[perc_lunas, perc_angsuran, perc_tunggakan],
                     hole=0.4,
-                    textinfo="label+percent",
+                    textinfo="percent",
                     marker=dict(colors=["#28a745", "#ffc107", "#dc3545"]),
                 )
             )
