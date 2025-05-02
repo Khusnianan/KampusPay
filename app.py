@@ -113,36 +113,6 @@ def home():
             """, unsafe_allow_html=True)
         
         with col2:
-            st.markdown("### 📊 Statistik Pembayaran")
-
-            # Sample data for each category (using percentages directly)
-            perc_lunas = 70  # Percentage of "Lunas" (Paid)
-            perc_angsuran = 20  # Percentage of "Angsuran" (Installment)
-            perc_tunggakan = 10  # Percentage of "Tunggakan" (Overdue)
-
-            # Pie chart to display payment categories distribution
-            fig = make_subplots(rows=1, cols=1, specs=[[{'type': 'pie'}]])
-
-            fig.add_trace(
-                go.Pie(
-                    labels=["Lunas", "Angsuran", "Tunggakan"],
-                    values=[perc_lunas, perc_angsuran, perc_tunggakan],
-                    hole=0.4,
-                    textinfo="label+percent",
-                    marker=dict(colors=["#28a745", "#ffc107", "#dc3545"]),
-                )
-            )
-
-            fig.update_layout(
-                title="Distribusi Pembayaran",
-                plot_bgcolor="white",
-                paper_bgcolor="white",
-                showlegend=True
-            )
-
-            # Display pie chart
-            st.plotly_chart(fig, use_container_width=True)
-
             # Progress Bars with Categories
             st.markdown("<h3 style='color: #28a745;'>📈 Pembayaran Lunas</h3>", unsafe_allow_html=True)
             st.progress(perc_lunas / 100, text=f"{perc_lunas:.2f}% Lunas")
