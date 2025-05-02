@@ -124,7 +124,7 @@ def home():
 
             fig.add_trace(
                 go.Pie(
-                    labels=[],
+                    labels=["Lunas","Angsuran","Tunggakan"],
                     values=[perc_lunas, perc_angsuran, perc_tunggakan],
                     hole=0.4,
                     textinfo="label+percent",
