@@ -132,8 +132,6 @@ def home():
     """, unsafe_allow_html=True)
 
     # ===== HEADER SECTION =====
-    logo_url = get_logo()
-    st.image(logo_url, width=150)
     st.markdown('<p class="main-title">🎓 Sistem Pembayaran Kuliah</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-title">STT Wastukancana</p>', unsafe_allow_html=True)
     
