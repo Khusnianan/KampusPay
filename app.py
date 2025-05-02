@@ -96,7 +96,7 @@ def home():
     
     # ===== HERO SECTION =====
     with st.container():
-        col1, col2 = st.columns([1.5, 1])
+        col1, col2 = st.columns([1, 1.3])
         
         with col1:
             st.markdown("""
