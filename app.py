@@ -154,7 +154,7 @@ def home():
             """, unsafe_allow_html=True)
         
         with col2:
-            st.image("https://cdn-icons-png.flaticon.com/512/3132/3132693.png", 
+            st.image("https://www.flaticon.com/free-icons/tuition", 
                     width=300, caption="Ilustrasi Pembayaran Digital")
 
     # ===== UPDATED STATISTICS SECTION =====
@@ -164,7 +164,7 @@ def home():
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; margin: 2rem 0;">
-        <p>© 2023 Bagian Keuangan STT Wastukancana</p>
+        <p>© 2025 Bagian Keuangan STT Wastukancana</p>
         <p style="font-size: 0.8rem;">Versi 2.1.0 | Terakhir diperbarui: 30 April 2025</p>
     </div>
     """, unsafe_allow_html=True)
